@@ -1,0 +1,46 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Healthy Diet Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h2>Healthy Diet Tracker</h2>
+                </div>
+                <div class="nav-menu">
+                    {% if session.user %}
+                    <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+                    <a href="{{ url_for('diet_plan') }}" class="nav-link">Diet Plan</a>
+                    <a href="{{ url_for('nutrition_analysis') }}" class="nav-link">Nutrition Analysis</a>
+                    <a href="{{ url_for('profile') }}" class="nav-link">Profile</a>
+                    <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+                    <span class="welcome-text">Welcome, {{ session.user.nickname or session.user.username }}!</span>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-container">
+                <p>&copy; 2025 Healthy Diet Tracker - Protecting Your Health</p>
+            </div>
+        </footer>
+    </div>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

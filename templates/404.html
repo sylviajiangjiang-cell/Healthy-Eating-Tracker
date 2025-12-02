@@ -1,0 +1,17 @@
+<!-- 404.html -->
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - Healthy Diet Tracker{% endblock %}
+
+{% block content %}
+<div class="error-container" style="text-align: center; padding: 50px 20px;">
+    <h1 style="font-size: 4rem; color: #4CAF50; margin-bottom: 20px;">404</h1>
+    <h2 style="color: #333; margin-bottom: 20px;">Page Not Found</h2>
+    <p style="color: #666; margin-bottom: 30px; font-size: 1.1rem;">
+        Sorry, the page you are looking for does not exist.
+    </p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary" style="font-size: 1.1rem;">
+        Return to Homepage
+    </a>
+</div>
+{% endblock %}

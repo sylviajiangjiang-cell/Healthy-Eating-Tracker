@@ -1,0 +1,319 @@
+<!-- index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h1>Welcome to Healthy Diet Tracker</h1>
+    <p>Scientific Diet, Healthy Life</p>
+</div>
+
+<div class="dashboard">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Today's Goal</h3>
+            <div class="stat-value">
+                {% if user.goal == 'weight-loss' %}Weight Loss
+                {% elif user.goal == 'muscle-gain' %}Muscle Gain
+                {% else %}Weight Maintenance
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <h3>BMI Index</h3>
+            <div class="stat-value">
+                {% if bmi %}
+                    {{ bmi }}
+                {% else %}
+                    Not Set
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Current Weight</h3>
+            <div class="stat-value">
+                {% if user.weight %}
+                    {{ user.weight }} kg
+                {% else %}
+                    Not Set
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Target Weight</h3>
+            <div class="stat-value">
+                {% if user.target_weight %}
+                    {{ user.target_weight }} kg
+                {% else %}
+                    Not Set
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Data Visualization -->
+    <div class="visualization-section card">
+        <div class="section-header">
+            <h2>📊 Health Data Visualization</h2>
+            <p class="section-subtitle">Visualize your health progress</p>
+        </div>
+        
+        <div class="viz-container">
+            <div class="viz-card">
+                <h4>BMI Health Assessment</h4>
+                <div class="viz-wrapper">
+                    <div id="bmi-gauge" class="viz-canvas"></div>
+                </div>
+                <div class="viz-info">
+                    <div class="info-item">
+                        <span class="info-label">Current Status:</span>
+                        <span class="info-value {{ bmi_status | lower | replace(' ', '-') }}">
+                            {{ bmi_status }}
+                        </span>
+                    </div>
+                    {% if bmi %}
+                    <div class="info-item">
+                        <span class="info-label">Ideal Range:</span>
+                        <span class="info-value">18.5 - 24</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="viz-card">
+                <h4>Weight Progress Tracking</h4>
+                <div class="viz-wrapper">
+                    <div id="progress-chart" class="viz-canvas"></div>
+                </div>
+                <div class="viz-info">
+                    {% if user.weight and user.target_weight %}
+                    <div class="info-item">
+                        <span class="info-label">Progress:</span>
+                        <span class="info-value {% if user.weight > user.target_weight %}weight-loss{% elif user.weight < user.target_weight %}weight-gain{% else %}goal-achieved{% endif %}">
+                            {% if user.weight > user.target_weight %}
+                            Need to lose {{ "%.1f"|format(user.weight - user.target_weight) }} kg
+                            {% elif user.weight < user.target_weight %}
+                            Need to gain {{ "%.1f"|format(user.target_weight - user.weight) }} kg
+                            {% else %}
+                            Goal Achieved!
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions card">
+        <div class="section-header">
+            <h2>🚀 Quick Start</h2>
+        </div>
+        <div class="action-buttons">
+            <a href="{{ url_for('diet_plan') }}" class="btn btn-primary">
+                View Diet Plan
+            </a>
+            <a href="{{ url_for('nutrition_analysis') }}" class="btn btn-secondary">
+                Nutrition Analysis
+            </a>
+            <a href="{{ url_for('profile') }}" class="btn btn-outline">
+                Update Profile
+            </a>
+        </div>
+    </div>
+
+    <div class="health-tips card">
+        <div class="section-header">
+            <h2>💡 Health Tips</h2>
+        </div>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-icon">💧</div>
+                <h3>Drink More Water</h3>
+                <p>Drink at least 8 glasses of water daily to maintain body hydration</p>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon">🥦</div>
+                <h3>Eat More Vegetables</h3>
+                <p>Consume enough vegetables daily for rich vitamins and fiber</p>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon">⚖️</div>
+                <h3>Balanced Diet</h3>
+                <p>Properly combine protein, carbohydrates and fat</p>
+            </div>
+            <div class="tip-card">
+                <div class="tip-icon">🏃</div>
+                <h3>Regular Exercise</h3>
+                <p>At least 150 minutes of moderate intensity exercise per week</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// BMI Gauge Visualization
+function setupBMIGauge() {
+    const sketch = function(p) {
+        let currentBMI = {{ bmi or 0 }};
+        let targetBMI = 22;
+        
+        p.setup = function() {
+            const canvas = p.createCanvas(280, 180);
+            canvas.parent('bmi-gauge');
+            canvas.style('border-radius', '8px');
+            canvas.style('display', 'block');
+            canvas.style('margin', '0 auto');
+        };
+        
+        p.draw = function() {
+            p.background(248, 249, 250);
+            
+            const centerX = p.width / 2;
+            const centerY = p.height - 20;
+            const radius = 65;
+            
+            // Draw BMI range background arc
+            p.stroke(220);
+            p.strokeWeight(18);
+            p.noFill();
+            p.arc(centerX, centerY, radius * 2, radius * 2, p.PI, p.TWO_PI);
+            
+            // Draw healthy range
+            const healthyStart = p.map(18.5, 15, 35, p.PI, p.TWO_PI);
+            const healthyEnd = p.map(24, 15, 35, p.PI, p.TWO_PI);
+            
+            p.stroke(76, 175, 80);
+            p.strokeWeight(18);
+            p.arc(centerX, centerY, radius * 2, radius * 2, healthyStart, healthyEnd);
+            
+            // Draw current BMI pointer
+            if (currentBMI > 0) {
+                const angle = p.map(p.constrain(currentBMI, 15, 35), 15, 35, p.PI, p.TWO_PI);
+                
+                // Pointer
+                p.stroke(33, 150, 243);
+                p.strokeWeight(3);
+                p.line(centerX, centerY, 
+                      centerX + p.cos(angle) * radius, 
+                      centerY + p.sin(angle) * radius);
+                
+                // Pointer dot
+                p.fill(33, 150, 243);
+                p.noStroke();
+                p.circle(centerX + p.cos(angle) * radius, 
+                        centerY + p.sin(angle) * radius, 8);
+                
+                // Center dot
+                p.fill(100);
+                p.circle(centerX, centerY, 6);
+            }
+            
+            // Draw scale
+            p.fill(100);
+            p.noStroke();
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(10);
+            
+            for (let i = 15; i <= 35; i += 5) {
+                const angle = p.map(i, 15, 35, p.PI, p.TWO_PI);
+                const x = centerX + p.cos(angle) * (radius + 15);
+                const y = centerY + p.sin(angle) * (radius + 15);
+                p.text(i, x, y);
+            }
+            
+            // Display current BMI value
+            if (currentBMI > 0) {
+                p.fill(33, 150, 243);
+                p.textSize(16);
+                p.textStyle(p.BOLD);
+                p.text(`BMI: ${currentBMI}`, centerX, 30);
+                p.textStyle(p.NORMAL);
+            }
+        };
+    };
+    
+    new p5(sketch);
+}
+
+// Progress Chart
+function setupProgressChart() {
+    const sketch = function(p) {
+        let currentWeight = {{ user.weight or 0 }};
+        let targetWeight = {{ user.target_weight or (user.weight or 0) }};
+        
+        p.setup = function() {
+            const canvas = p.createCanvas(280, 180);
+            canvas.parent('progress-chart');
+            canvas.style('border-radius', '8px');
+            canvas.style('display', 'block');
+            canvas.style('margin', '0 auto');
+        };
+        
+        p.draw = function() {
+            p.background(248, 249, 250);
+            
+            if (currentWeight > 0 && targetWeight > 0 && currentWeight !== targetWeight) {
+                const progress = ((currentWeight - targetWeight) / Math.max(currentWeight, targetWeight)) * 100;
+                const isWeightLoss = progress > 0;
+                
+                // Draw progress bar background
+                p.fill(240);
+                p.noStroke();
+                p.rect(40, 80, 200, 25, 12);
+                
+                // Draw progress
+                const barWidth = p.map(Math.abs(progress), 0, 50, 0, 200);
+                if (isWeightLoss) {
+                    p.fill(244, 67, 54); // Red - Weight Loss
+                    p.rect(140, 80, barWidth, 25, 0, 12, 12, 0);
+                } else {
+                    p.fill(33, 150, 243); // Blue - Weight Gain
+                    p.rect(140 - barWidth, 80, barWidth, 25, 12, 0, 0, 12);
+                }
+                
+                // Draw labels and values
+                p.fill(60);
+                p.textAlign(p.CENTER);
+                p.textSize(12);
+                p.text("Current Weight", 90, 65);
+                p.text("Target Weight", 190, 65);
+                
+                p.textSize(14);
+                p.textStyle(p.BOLD);
+                p.text(`${currentWeight}kg`, 90, 115);
+                p.text(`${targetWeight}kg`, 190, 115);
+                p.textStyle(p.NORMAL);
+                
+                // Draw center line indicator
+                p.stroke(150);
+                p.strokeWeight(1);
+                p.line(140, 60, 140, 130);
+                
+                // Draw progress percentage
+                p.fill(isWeightLoss ? '#f44336' : '#2196f3');
+                p.textSize(16);
+                p.text(`${Math.abs(progress).toFixed(1)}%`, p.width/2, 40);
+                
+            } else {
+                p.fill(100);
+                p.textAlign(p.CENTER, p.CENTER);
+                p.textSize(14);
+                p.text("Please set weight and target weight", p.width/2, p.height/2);
+            }
+        };
+    };
+    
+    new p5(sketch);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupBMIGauge();
+    setupProgressChart();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+<!-- error.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Error - Healthy Diet Tracker
+{% endblock %}
+
+{% block content %}
+  <div class="error-container" style="text-align: center; padding: 50px 20px;">
+    <h1 style="font-size: 3rem; color: #ff9800; margin-bottom: 20px;">Error</h1>
+    <div class="alert alert-error" style="max-width: 500px; margin: 0 auto 30px;">{{ error }}</div>
+    <div class="action-buttons">
+      <a href="{{ url_for('index') }}" class="btn btn-primary">Return to Homepage</a>
+      <button onclick="window.history.back()" class="btn btn-outline">Go Back</button>
+    </div>
+  </div>
+{% endblock %}

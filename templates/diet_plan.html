@@ -1,0 +1,108 @@
+<!-- diet_plan.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+  Diet Plan - Healthy Diet Tracker
+{% endblock %}
+
+{% block content %}
+  <div class="plan-container">
+    <div class="plan-header">
+      <h2>Personalized Diet Plan</h2>
+      <p>Custom dietary recommendations based on your profile and goals</p>
+    </div>
+
+    <div class="user-info-grid">
+      <div class="info-card">
+        <div class="info-header">
+          <div class="info-icon">🎯</div>
+          <div class="info-title">Goal</div>
+        </div>
+        <div class="info-content">
+          <div class="info-value">
+            {% if user.goal == 'weight-loss' %}
+              Weight Loss
+            {% elif user.goal == 'muscle-gain' %}
+              Muscle Gain
+            {% else %}
+              Weight Maintenance
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-header">
+          <div class="info-icon">📊</div>
+          <div class="info-title">BMI Index</div>
+        </div>
+        <div class="info-content">
+          <div class="info-value">
+            {% if bmi %}
+              {{ bmi }}
+            {% else %}
+              Not Set
+            {% endif %}
+          </div>
+          <div class="info-status {{ bmi_status|lower|replace(' ', '-') }}">{{ bmi_status }}</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-header">
+          <div class="info-icon">🔥</div>
+          <div class="info-title">Recommended Daily Calories</div>
+        </div>
+        <div class="info-content">
+          <div class="info-value">{{ diet_generator.calculate_daily_calories(user) }}</div>
+          <div class="info-unit">Calories</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meal-plan">
+      {% for meal in plan %}
+        <div class="meal-card">
+          <h3>{{ meal.name }}</h3>
+          <div class="nutrition-facts">
+            <div class="nutrition-item">
+              <div class="nutrition-value">{{ meal.calories }}</div>
+              <div class="nutrition-label">Calories</div>
+            </div>
+            <div class="nutrition-item">
+              <div class="nutrition-value">{{ meal.protein }}g</div>
+              <div class="nutrition-label">Protein</div>
+            </div>
+            <div class="nutrition-item">
+              <div class="nutrition-value">{{ meal.carbs }}g</div>
+              <div class="nutrition-label">Carbs</div>
+            </div>
+            <div class="nutrition-item">
+              <div class="nutrition-value">{{ meal.fat }}g</div>
+              <div class="nutrition-label">Fat</div>
+            </div>
+          </div>
+
+          <div class="meal-suggestions">
+            <h4>Diet Suggestions:</h4>
+            <ul>
+              {% if meal.name == 'Breakfast' %}
+                <li>Choose complex carbohydrates like whole wheat bread, oatmeal</li>
+                <li>Pair with quality protein sources like eggs, milk</li>
+                <li>Add fruits for vitamins</li>
+              {% elif meal.name == 'Lunch' %}
+                <li>Main course with brown rice, whole wheat</li>
+                <li>Protein sources: chicken breast, fish, tofu</li>
+                <li>Plenty of vegetables for fiber</li>
+              {% else %}
+                <li>Moderate protein, avoid excess</li>
+                <li>Choose easily digestible foods</li>
+                <li>Control carbohydrate intake</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

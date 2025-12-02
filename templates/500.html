@@ -1,0 +1,17 @@
+<!-- 500.html -->
+{% extends "base.html" %}
+
+{% block title %}Server Error - Healthy Diet Tracker{% endblock %}
+
+{% block content %}
+<div class="error-container" style="text-align: center; padding: 50px 20px;">
+    <h1 style="font-size: 4rem; color: #f44336; margin-bottom: 20px;">500</h1>
+    <h2 style="color: #333; margin-bottom: 20px;">Server Error</h2>
+    <p style="color: #666; margin-bottom: 30px; font-size: 1.1rem;">
+        Sorry, there was a problem with the server. Please try again later.
+    </p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary" style="font-size: 1.1rem;">
+        Return to Homepage
+    </a>
+</div>
+{% endblock %}

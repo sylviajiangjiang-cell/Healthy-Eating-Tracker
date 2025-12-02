@@ -1,0 +1,257 @@
+<!-- nutrition.html -->
+{% extends "base.html" %}
+
+{% block title %}Nutrition Analysis - Healthy Diet Tracker{% endblock %}
+
+{% block content %}
+<div class="nutrition-container">
+    <div class="page-header card">
+        <h1>📈 Food Nutrition Analysis</h1>
+        <p class="page-subtitle">Scientific analysis of food nutrition for healthy eating</p>
+    </div>
+
+    <div class="analysis-card card">
+        <div class="card-header">
+            <h3>🔍 Food Analysis</h3>
+        </div>
+        <div class="form-wrapper">
+            <form method="POST" class="centered-form">
+                <div class="form-group">
+                    <label for="food_name">🍎 Food Name</label>
+                    <input type="text" id="food_name" name="food_name" required 
+                           list="foods" placeholder="Enter food name...">
+                    <datalist id="foods">
+                        {% for food in food_database.keys() %}
+                        <option value="{{ food }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">⚖️ Amount (grams)</label>
+                    <input type="number" id="amount" name="amount" value="100" min="1" step="1">
+                </div>
+                
+                <div class="form-submit">
+                    <button type="submit" class="btn btn-primary btn-large">
+                        Analyze Nutrition
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        {% if error %}
+        <div class="alert alert-error">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+    </div>
+
+    {% if analysis_result %}
+    <div class="result-section">
+        <div class="result-header card">
+            <h3>📊 Analysis Result</h3>
+            <div class="food-badge">
+                <span class="badge-icon">🍎</span>
+                <span class="badge-text">{{ analysis_result.food_name }} ({{ analysis_result.amount }}g)</span>
+            </div>
+        </div>
+
+        <!-- Nutrition Visualization -->
+        <div class="nutrition-visualization card">
+            <div class="card-header">
+                <h4>📋 Nutrition Distribution</h4>
+            </div>
+            <div class="viz-content">
+                <div class="chart-container">
+                    <div id="nutrition-chart" class="nutrition-chart"></div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color protein"></span>
+                        <span class="legend-label">Protein</span>
+                        <span class="legend-value">{{ analysis_result.nutrition.protein }}g</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color carbs"></span>
+                        <span class="legend-label">Carbohydrates</span>
+                        <span class="legend-value">{{ analysis_result.nutrition.carbs }}g</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color fat"></span>
+                        <span class="legend-label">Fat</span>
+                        <span class="legend-value">{{ analysis_result.nutrition.fat }}g</span>
+                    </div>
+                    {% if analysis_result.nutrition.sugar %}
+                    <div class="legend-item">
+                        <span class="legend-color sugar"></span>
+                        <span class="legend-label">Sugar</span>
+                        <span class="legend-value">{{ analysis_result.nutrition.sugar }}g</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="nutrition-details card">
+            <div class="card-header">
+                <h4>📝 Detailed Data</h4>
+            </div>
+            <div class="nutrition-grid">
+                <div class="nutrition-card primary">
+                    <div class="nutrition-value">{{ analysis_result.nutrition.calories }}</div>
+                    <div class="nutrition-label">Calories</div>
+                    <div class="nutrition-unit">kcal</div>
+                </div>
+                
+                <div class="nutrition-card">
+                    <div class="nutrition-value">{{ analysis_result.nutrition.protein }}</div>
+                    <div class="nutrition-label">Protein</div>
+                    <div class="nutrition-unit">g</div>
+                </div>
+                
+                <div class="nutrition-card">
+                    <div class="nutrition-value">{{ analysis_result.nutrition.carbs }}</div>
+                    <div class="nutrition-label">Carbohydrates</div>
+                    <div class="nutrition-unit">g</div>
+                </div>
+                
+                <div class="nutrition-card">
+                    <div class="nutrition-value">{{ analysis_result.nutrition.fat }}</div>
+                    <div class="nutrition-label">Fat</div>
+                    <div class="nutrition-unit">g</div>
+                </div>
+                
+                {% if analysis_result.nutrition.sugar %}
+                <div class="nutrition-card">
+                    <div class="nutrition-value">{{ analysis_result.nutrition.sugar }}</div>
+                    <div class="nutrition-label">Sugar</div>
+                    <div class="nutrition-unit">g</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="health-tip card">
+            <div class="card-header">
+                <h4>💡 Health Advice</h4>
+            </div>
+            <div class="tip-content">
+                <div class="tip-text">
+                    {% if analysis_result.nutrition.calories > 200 %}
+                    This food is high in calories, recommended to consume in moderation with vegetables and protein foods.
+                    {% elif analysis_result.nutrition.protein > 10 %}
+                    Rich in quality protein, suitable for fitness and muscle building periods.
+                    {% elif analysis_result.nutrition.fat > 10 %}
+                    High in fat content, pay attention to control intake, recommended to pair with high-fiber foods.
+                    {% else %}
+                    Nutritionally balanced, suitable for daily diet, can be consumed with confidence.
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="food-database card">
+        <div class="card-header">
+            <h4>🍽️ Supported Foods for Analysis</h4>
+        </div>
+        <div class="food-grid">
+            {% for food in food_database.keys() %}
+            <div class="food-item">
+                <span class="food-icon">
+                    {% if 'Chicken' in food %}🍗
+                    {% elif 'Rice' in food %}🍚
+                    {% elif 'Broccoli' in food %}🥦
+                    {% elif 'Salmon' in food %}🐟
+                    {% elif 'Avocado' in food %}🥑
+                    {% elif 'Bread' in food %}🍞
+                    {% elif 'Egg' in food %}🥚
+                    {% elif 'Milk' in food %}🥛
+                    {% elif 'Oatmeal' in food %}🥣
+                    {% elif 'Nuts' in food %}🥜
+                    {% elif 'Tofu' in food %}🧈
+                    {% elif 'Fruit' in food %}🍎
+                    {% elif 'Vegetable' in food %}🥬
+                    {% else %}🍽️
+                    {% endif %}
+                </span>
+                <span class="food-name">{{ food }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if analysis_result %}
+<script>
+// Nutrition Data Visualization
+function setupNutritionChart() {
+    const sketch = function(p) {
+        let nutrition = {{ analysis_result.nutrition | tojson }};
+        let angles = [];
+        let colors = [
+            p.color(255, 99, 132),   // Protein - Red
+            p.color(54, 162, 235),   // Carbs - Blue
+            p.color(255, 206, 86),   // Fat - Yellow
+            p.color(75, 192, 192)    // Sugar - Cyan
+        ];
+        
+        p.setup = function() {
+            const canvas = p.createCanvas(300, 220);
+            canvas.parent('nutrition-chart');
+            canvas.style('border-radius', '8px');
+            canvas.style('display', 'block');
+            canvas.style('margin', '0 auto');
+            
+            // Calculate pie chart angles
+            let total = nutrition.protein + nutrition.carbs + nutrition.fat + (nutrition.sugar || 0);
+            angles = [
+                (nutrition.protein / total) * p.TWO_PI,
+                (nutrition.carbs / total) * p.TWO_PI,
+                (nutrition.fat / total) * p.TWO_PI,
+                ((nutrition.sugar || 0) / total) * p.TWO_PI
+            ];
+        };
+        
+        p.draw = function() {
+            p.background(248, 249, 250);
+            
+            const centerX = p.width / 2;
+            const centerY = p.height / 2;
+            const radius = 70;
+            
+            let lastAngle = 0;
+            
+            // Draw pie chart
+            for (let i = 0; i < angles.length; i++) {
+                p.fill(colors[i]);
+                p.stroke(255);
+                p.strokeWeight(2);
+                p.arc(centerX, centerY, radius * 2, radius * 2, lastAngle, lastAngle + angles[i]);
+                lastAngle += angles[i];
+            }
+            
+            // Center text
+            p.fill(60);
+            p.noStroke();
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(14);
+            p.textStyle(p.BOLD);
+            p.text('Nutrition Distribution', centerX, centerY);
+            p.textStyle(p.NORMAL);
+        };
+    };
+    
+    new p5(sketch);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupNutritionChart();
+});
+</script>
+{% endif %}
+{% endblock %}
